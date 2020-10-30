@@ -1,0 +1,142 @@
+
+
+/* ------------------ LOGIN ------------------ */
+
+
+
+/* Tipografía oficial */
+body {
+   font-family: 'Ubuntu', sans-serif;
+}
+
+
+/* Estilo de la palabra "Login" */
+.login-page .login-box .msg {
+    color: #52b788 !important;
+    font-size: 35px !important;
+}
+
+
+/* Estilo del botón "He olvidado mi contraseña" */
+.login-page .login-box a {
+    color: #f8f9fa !important;
+}
+
+
+/* Color botón "Entrar" */
+.bg-blue {
+    background-color: #52b788 !important;
+}
+
+
+/* Estilo de los íconos */
+.input-group .input-group-addon .material-icons {
+    font-size: 28px !important;
+    color: #52b788 !important;
+}
+
+
+
+
+
+
+/* ------------------ DASHBOARD ------------------ */
+
+
+
+/* Tipografía oficial */
+body {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+
+/* Color navbar */
+.theme-blue .navbar {
+    background-color: #52b788 !important;
+}
+
+
+/* Color íconos superiores derecha */
+.theme-blue .nav > li > a {
+    color: #f8f9fa !important;
+}
+
+
+/* Color barras superiores */
+.bg-blue {
+    background-color: #52b788 !important;
+}
+
+
+/* Color textos */
+.card .body {
+   color: #000 !important;
+}
+
+
+/* Color títulos H2 */
+.card .bg-blue h2 {
+    color: #f8f9fa !important;
+}
+
+
+/* Tipogafía oficial Sidebar */
+.sidebar {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+
+/* Color textos Sidebar */
+.sidebar .menu .list a span {
+    color: #f8f9fa !important;
+}
+
+
+/* Color textos info Sidebar */
+.sidebar .user-info .info-container .name {
+    color: #52b788 !important;
+}
+
+
+/* Color textos info Sidebar */
+.sidebar .user-info .info-container .email {
+    color: #52b788 !important;
+}
+
+
+/* Color íconos Sidebar */
+.sidebar .user-info .info-container .user-helper-dropdown {
+    color: #52b788 !important;
+}
+
+
+/* Color menú Sidebar */
+.sidebar .menu .list .header {
+    background: #f8f9fa !important;
+}
+
+
+/* Borde Sidebar */
+.sidebar .user-info {
+    border-bottom: 0px !important;
+}
+
+
+/* Color íconos Sidebar */
+.sidebar .menu .list a {
+    color: #f8f9fa !important;
+}
+
+
+/* Color textos Sidebar */
+.sidebar .menu .list {
+    background-color: #52b788 !important;
+}
+
+.navbar-brand {
+   color:#f8f9fa !important;
+}
+
+.card .header .bg-blue h2 {
+   color:#f8f9fa !important;
+}
