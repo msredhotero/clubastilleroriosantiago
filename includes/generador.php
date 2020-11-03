@@ -36,11 +36,7 @@ function query($sql,$accion) {
 
 
 $tablasAr	= array(
-						'citas' => 'dbcitas',
-						'pacientes' => 'dbpacientes',
-						'aseguradoras' => 'tbaseguradoras',
-						'empleados' => 'tbempleados',
-						'metodopago' => 'tbmetodopago',
+						'socios' => 'dbsocios',
 						'tiposervicios' => 'tbtiposervicios',
 							);
 
@@ -48,20 +44,12 @@ $tablasAr	= array(
 function recursiveTablas($ar, $tabla, $aliasTablaMadre) {
 
 	$tablasArAux2	= array(
-						'citas' => 'dbcitas',
-						'pacientes' => 'dbpacientes',
-						'aseguradoras' => 'tbaseguradoras',
-						'empleados' => 'tbempleados',
-						'metodopago' => 'tbmetodopago',
+						'socios' => 'dbsocios',
 						'tiposervicios' => 'tbtiposervicios',
 							);
 
 	$tablasArAux	= array(
-						'citas' => 4,
-						'pacientes' => 1,
-						'aseguradoras' => 1,
-						'empleados' => 1,
-						'metodopago' => 1,
+						'socios' => 1,
 						'tiposervicios' => 1,
 							);
 
@@ -93,7 +81,7 @@ $ajaxFuncionesController = '';
 
 $servicios	= "Referencias";
 
-$sqlMapaer	= "SHOW FULL TABLES FROM gestionclinicas";
+$sqlMapaer	= "SHOW FULL TABLES FROM clubastillo";
 $resMapeo 	=	query($sqlMapaer,0);
 
 $aliasTablaMadre = '';

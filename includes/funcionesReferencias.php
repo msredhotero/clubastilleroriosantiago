@@ -5,70 +5,169 @@
  * @ABM consultas sobre las tablas de usuarios y usarios-clientes
  */
 
-date_default_timezone_set('America/Mexico_City');
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 class ServiciosReferencias {
 
+   function calcularCuotaTodos($idtiposervicio, $activos) {
+      $resTS = $this->traerTiposerviciosPorId($idtiposervicio);
 
-   /* PARA Citas */
+      $valor = mysql_result($resTS,0,2);
 
-   function insertarCitas($refpacientes,$refempleados,$reftiposervicios,$refaseguradoras,$refmetodopago,$fecha,$hora,$precio,$iva,$irpf,$observaciones) {
-   $sql = "insert into dbcitas(idcita,refpacientes,refempleados,reftiposervicios,refaseguradoras,refmetodopago,fecha,hora,precio,iva,irpf,observaciones)
-   values ('',".$refpacientes.",".$refempleados.",".$reftiposervicios.",".$refaseguradoras.",".$refmetodopago.",'".$fecha."','".$hora."',".$precio.",".$iva.",".$irpf.",'".$observaciones."')";
-   $res = $this->query($sql,1);
-   return $res;
+      if ($activos == '1') {
+         $resTotal = mysql_num_rows($this->traerSociosActicos());
+      } else {
+         $resTotal = mysql_num_rows($this->traerSocios());
+      }
+
+      return $resTotal * $valor;
+
+
+   }
+
+   function generarArchivo($idtiposervicio, $activos) {
+
+      $resTS = $this->traerTiposerviciosPorId($idtiposervicio);
+
+      $valor = mysql_result($resTS,0,2);
+
+      if ($activos == '1') {
+         $resTotal = $this->traerSociosActicos();
+      } else {
+         $resTotal = $this->traerSocios();
+      }
+
+      $fecha = date('Y-m-d');
+      $nuevafecha = strtotime ( '+2 day' , strtotime ( $fecha ) ) ;
+      $nuevafecha = date ( 'dmY' , $nuevafecha );
+
+      $dia = substr(date ( 'd' , $nuevafecha ).'00',0,2);
+      $mes = substr(date ( 'm' , $nuevafecha ).'00',0,2);
+      $anio = date ( 'Y' , $nuevafecha );
+
+      $fechaCompleta = $nuevafecha;
+
+
+      $cad = '';
+      $nombreFichero = "EBT_CLUBASTILLEROR_".date('YmdHmi');
+      $file = fopen($nombreFichero.".txt", "w");
+
+      $i = 0;
+      $codint = '71';
+      $fechavencimiento = $fechaCompleta;
+      $referencia = '';
+      $idencliente = '';
+      $tipomoneda = 'P';
+      $cbubloque1 = '';
+      $cbubloque2 = '';
+      $importe = '';
+      $cuitempresa = '30634354766';
+      $descripcionprestacion = 'DEBITO03  ';
+      $refunivoca = '               ';
+      $refinttransc = '               ';
+      $nroidencliente = '                      ';
+      $codrechazo = '   ';
+      $nombreempresa = 'CLUBASTILLEROR  ';
+
+      while ($row = mysql_fetch_array($resTotal)) {
+         if ($row['cbubloque1'] != '') {
+            $i += 1;
+            $referencia = substr('000000'.$i,-6);
+            $idencliente = substr($row['apellido'].' '.$row['nombre'].'                      ',0,22);
+            $cbubloque1 = $row['cbubloque1'];
+            $cbubloque2 = $row['cbubloque2'];
+            $importe = substr('0000000000'.str_replace('.','', $valor),-10);
+
+            fwrite($file, $codint.$fechavencimiento.$referencia.$idencliente.$tipomoneda.$cbubloque1.$cbubloque2.$importe.$cuitempresa.$descripcionprestacion.$refunivoca.$refinttransc.$nroidencliente.$codrechazo.$nombreempresa . PHP_EOL);
+         }
+
+
+      }
+
+      fclose($file);
+
+
+      if ($i == 0) {
+         return array('mensaje'=> 'Se procesaron: '.$i.' registros', 'archivo' =>'');
+      } else {
+         return array('mensaje'=> 'Se procesaron: '.$i.' registros', 'archivo' => $nombreFichero.".txt");
+      }
+
    }
 
 
-   function modificarCitas($id,$refpacientes,$refempleados,$reftiposervicios,$refaseguradoras,$refmetodopago,$fecha,$hora,$precio,$iva,$irpf,$observaciones) {
-   $sql = "update dbcitas
-   set
-   refpacientes = ".$refpacientes.",refempleados = ".$refempleados.",reftiposervicios = ".$reftiposervicios.",refaseguradoras = ".$refaseguradoras.",refmetodopago = ".$refmetodopago.",fecha = '".$fecha."',hora = '".$hora."',precio = ".$precio.",iva = ".$iva.",irpf = ".$irpf.",observaciones = '".$observaciones."'
-   where idcita =".$id;
+   /* PARA Socios */
+
+
+   function insertarSocios($nrosocio,$apellido,$nombre,$genero,$dni,$cuil,$fechanacimiento,$telefonofijo,$telefonocelular,$direccion,$activo,$cbubloque1,$cbubloque2) {
+      if ($fechanacimiento == '') {
+         $sql = "insert into dbsocios(idsocio,nrosocio,apellido,nombre,genero,dni,cuil,fechanacimiento,telefonofijo,telefonocelular,direccion,activo)
+         values ('','".$nrosocio."','".$apellido."','".$nombre."','".$genero."',".$dni.",'".$cuil."',null,'".$telefonofijo."','".$telefonocelular."','".$direccion."','".$activo."','".$cbubloque1."','".$cbubloque2."')";
+      } else {
+         $sql = "insert into dbsocios(idsocio,nrosocio,apellido,nombre,genero,dni,cuil,fechanacimiento,telefonofijo,telefonocelular,direccion,activo)
+         values ('','".$nrosocio."','".$apellido."','".$nombre."','".$genero."',".$dni.",'".$cuil."','".$fechanacimiento."','".$telefonofijo."','".$telefonocelular."','".$direccion."','".$activo."','".$cbubloque1."','".$cbubloque2."')";
+      }
+
+      $res = $this->query($sql,1);
+      return $res;
+   }
+
+
+   function modificarSocios($id,$nrosocio,$apellido,$nombre,$genero,$dni,$cuil,$fechanacimiento,$telefonofijo,$telefonocelular,$direccion,$activo,$cbubloque1,$cbubloque2) {
+      if ($fechanacimiento == '') {
+         $sql = "update dbsocios
+         set
+         nrosocio = '".$nrosocio."',apellido = '".$apellido."',nombre = '".$nombre."',genero = '".$genero."',dni = ".$dni.",cuil = '".$cuil."',fechanacimiento = null,telefonofijo = '".$telefonofijo."',telefonocelular = '".$telefonocelular."',direccion = '".$direccion."',activo = '".$activo."',cbubloque1 = '".$cbubloque1."',cbubloque2 = '".$cbubloque2."'
+         where idsocio =".$id;
+      } else {
+         $sql = "update dbsocios
+         set
+         nrosocio = '".$nrosocio."',apellido = '".$apellido."',nombre = '".$nombre."',genero = '".$genero."',dni = ".$dni.",cuil = '".$cuil."',fechanacimiento = '".$fechanacimiento."',telefonofijo = '".$telefonofijo."',telefonocelular = '".$telefonocelular."',direccion = '".$direccion."',activo = '".$activo."',cbubloque1 = '".$cbubloque1."',cbubloque2 = '".$cbubloque2."'
+         where idsocio =".$id;
+      }
+
+
+      $res = $this->query($sql,0);
+      return $res;
+   }
+
+
+   function eliminarSocios($id) {
+   $sql = "update dbsocios set activo = '0' where idsocio =".$id;
    $res = $this->query($sql,0);
    return $res;
    }
 
-
-   function eliminarCitas($id) {
-   $sql = "delete from dbcitas where idcita =".$id;
+   function eliminarSociosDefinitivo($id) {
+   $sql = "delete from dbsocios where idsocio =".$id;
    $res = $this->query($sql,0);
    return $res;
    }
 
-   function traerCitasajax($length, $start, $busqueda,$colSort,$colSortDir) {
+   function traerSociosajax($length, $start, $busqueda,$colSort,$colSortDir) {
 
 		$where = '';
 
 		$busqueda = str_replace("'","",$busqueda);
 		if ($busqueda != '') {
-			$where = " where a.aseguradora like '%".$busqueda."%' ";
+			$where = " where s.nrosocio like '%".$busqueda."%' or s.apellido like '%".$busqueda."%' or s.apellido like '%".$busqueda."%' or s.nombre like '%".$busqueda."%' or s.genero like '%".$busqueda."%' or s.dni like '%".$busqueda."%' or s.cuil like '%".$busqueda."%' ";
 		}
 
 
 		$sql = "select
-      c.idcita,
-      concat(pac.apellido, ' ', pac.nombre) as pacientes,
-      tip.tiposervicio,
-      c.fecha,
-      c.hora,
-      c.precio,
-      concat(emp.apellido, ' ', emp.nombre) as empleados,
-      ase.aseguradora,
-      c.iva,
-      c.irpf,
-      c.refpacientes,
-      c.refempleados,
-      c.reftiposervicios,
-      c.refaseguradoras,
-      c.refmetodopago,
-      c.observaciones
-      from dbcitas c
-      inner join dbpacientes pac ON pac.idpaciente = c.refpacientes
-      inner join tbtiposervicios tip ON tip.idtiposervicio = c.reftiposervicios
-      inner join tbmetodopago met ON met.idmetodopago = c.refmetodopago
-      left join tbaseguradoras ase on ase.idaseguradora = c.refaseguradoras
-      left join tbempleados emp on emp.idempleado = c.refempleados
+      s.idsocio,
+      s.nrosocio,
+      s.apellido,
+      s.nombre,
+      s.genero,
+      s.dni,
+      s.cuil,
+      s.fechanacimiento,
+      s.telefonofijo,
+      s.telefonocelular,
+      (case when s.activo = '1' then 'Si' else 'No' end) as activo,
+      s.direccion
+      from dbsocios s
       ".$where."
 		ORDER BY ".$colSort." ".$colSortDir." ";
 		$limit = "limit ".$start.",".$length;
@@ -80,183 +179,59 @@ class ServiciosReferencias {
 	}
 
 
-   function traerCitas() {
+   function traerSocios() {
    $sql = "select
-   c.idcita,
-   c.refpacientes,
-   c.refempleados,
-   c.reftiposervicios,
-   c.refaseguradoras,
-   c.refmetodopago,
-   c.fecha,
-   c.hora,
-   c.precio,
-   c.iva,
-   c.irpf,
-   c.observaciones
-   from dbcitas c
-   inner join dbpacientes pac ON pac.idpaciente = c.refpacientes
-   inner join tbtiposervicios tip ON tip.idtiposervicio = c.reftiposervicios
-   inner join tbmetodopago met ON met.idmetodopago = c.refmetodopago
-   left join tbaseguradoras ase on ase.idaseguradora = c.refaseguradoras
-   left join tbempleados emp on emp.idempleado = c.refempleados
+   s.idsocio,
+   s.nrosocio,
+   s.apellido,
+   s.nombre,
+   s.genero,
+   s.dni,
+   s.cuil,
+   s.fechanacimiento,
+   s.telefonofijo,
+   s.telefonocelular,
+   s.direccion,
+   s.cbubloque1,
+   s.cbubloque2
+   from dbsocios s
    order by 1";
    $res = $this->query($sql,0);
    return $res;
    }
 
-   function traerCitasCalendar() {
+   function traerSociosActicos() {
    $sql = "select
-      c.idcita,
-      concat(pac.apellido, ' ', pac.nombre) as paciente,
-      concat(c.fecha, ' ', c.hora) as start,
-      DATE_ADD(concat(c.fecha, ' ', c.hora),INTERVAL 1 hour) end,
-      concat(pac.apellido, ' ', pac.nombre, ' - ', tip.tiposervicio) as title,
-      concat(pac.apellido, ' ', pac.nombre, ' - ', tip.tiposervicio) as description,
-      '#F5B041' as color,
-      tip.tiposervicio,
-      c.fecha,
-      c.hora,
-      c.precio,
-      concat(emp.apellido, ' ', emp.nombre) as empleado,
-      coalesce( ase.aseguradora,'') as aseguradora,
-      c.iva,
-      c.irpf,
-      c.refpacientes,
-      c.refempleados,
-      c.reftiposervicios,
-      c.refaseguradoras,
-      c.refmetodopago,
-      c.observaciones
-   from dbcitas c
-   inner join dbpacientes pac ON pac.idpaciente = c.refpacientes
-   inner join tbtiposervicios tip ON tip.idtiposervicio = c.reftiposervicios
-   inner join tbmetodopago met ON met.idmetodopago = c.refmetodopago
-   left join tbaseguradoras ase on ase.idaseguradora = c.refaseguradoras
-   left join tbempleados emp on emp.idempleado = c.refempleados
+   s.idsocio,
+   s.nrosocio,
+   s.apellido,
+   s.nombre,
+   s.genero,
+   s.dni,
+   s.cuil,
+   s.fechanacimiento,
+   s.telefonofijo,
+   s.telefonocelular,
+   s.direccion,
+   s.cbubloque1,
+   s.cbubloque2
+   from dbsocios s
+   where s.activo = '1'
    order by 1";
    $res = $this->query($sql,0);
    return $res;
    }
 
 
-   function traerCitasPorId($id) {
-   $sql = "select idcita,refpacientes,refempleados,reftiposervicios,refaseguradoras,refmetodopago,fecha,hora,precio,iva,irpf,observaciones from dbcitas where idcita =".$id;
+   function traerSociosPorId($id) {
+   $sql = "select idsocio,nrosocio,apellido,nombre,genero,dni,cuil,fechanacimiento,telefonofijo,telefonocelular,direccion,activo,cbubloque1,cbubloque2 from dbsocios where idsocio =".$id;
    $res = $this->query($sql,0);
    return $res;
    }
 
 
    /* Fin */
-   /* /* Fin de la Tabla: dbcitas*/
-
-
-
-
-/* PARA Pacientes */
-
-function insertarPacientes($nombre,$apellido,$telefono,$email,$dni,$tutor,$direccion,$observaciones) {
-$sql = "insert into dbpacientes(idpaciente,nombre,apellido,telefono,email,dni,tutor,direccion,observaciones)
-values ('','".$nombre."','".$apellido."','".$telefono."','".$email."','".$dni."','".$tutor."','".$direccion."','".$observaciones."')";
-$res = $this->query($sql,1);
-return $res;
-}
-
-
-function modificarPacientes($id,$nombre,$apellido,$telefono,$email,$dni,$tutor,$direccion,$observaciones) {
-$sql = "update dbpacientes
-set
-nombre = '".$nombre."',apellido = '".$apellido."',telefono = '".$telefono."',email = '".$email."',dni = '".$dni."',tutor = '".$tutor."',direccion = '".$direccion."',observaciones = '".$observaciones."'
-where idpaciente =".$id;
-$res = $this->query($sql,0);
-return $res;
-}
-
-
-function eliminarPacientes($id) {
-$sql = "delete from dbpacientes where idpaciente =".$id;
-$res = $this->query($sql,0);
-return $res;
-}
-
-function traerPacientesajax($length, $start, $busqueda,$colSort,$colSortDir) {
-
-   $where = '';
-
-   $busqueda = str_replace("'","",$busqueda);
-   if ($busqueda != '') {
-      $where = " where p.nombre like '%".$busqueda."%' or p.apellido like '%".$busqueda."%' or p.telefono like '%".$busqueda."%' or p.email like '%".$busqueda."%' or p.dni like '%".$busqueda."%' or p.tutor like '%".$busqueda."%' ";
-   }
-
-
-   $sql = "select
-   p.idpaciente,
-   p.nombre,
-   p.apellido,
-   p.telefono,
-   p.email,
-   p.dni,
-   p.tutor,
-   p.direccion,
-   p.observaciones
-   from dbpacientes p
-   ".$where."
-   ORDER BY ".$colSort." ".$colSortDir." ";
-   $limit = "limit ".$start.",".$length;
-
-   //die(var_dump($sql));
-
-   $res = array($this->query($sql.$limit,0) , $this->query($sql,0));
-   return $res;
-}
-
-function traerPacientesInfo() {
-$sql = "select
-p.idpaciente,
-p.nombre,
-p.apellido,
-p.telefono,
-p.email,
-p.dni,
-p.tutor,
-p.direccion,
-p.observaciones,
-concat(p.apellido, ' ', p.nombre, ' - ' , p.dni) as informacion
-from dbpacientes p
-order by 1";
-$res = $this->query($sql,0);
-return $res;
-}
-
-function traerPacientesInfoPorId($id) {
-$sql = "select
-p.idpaciente,
-p.nombre,
-p.apellido,
-p.telefono,
-p.email,
-p.dni,
-p.tutor,
-p.direccion,
-p.observaciones,
-concat(p.apellido, ' ', p.nombre, ' - ' , p.dni) as informacion
-from dbpacientes p
-where p.idpaciente = ".$id."
-order by 1";
-$res = $this->query($sql,0);
-return $res;
-}
-
-
-function traerPacientesPorId($id) {
-$sql = "select idpaciente,nombre,apellido,telefono,email,dni,tutor,direccion,observaciones from dbpacientes where idpaciente =".$id;
-$res = $this->query($sql,0);
-return $res;
-}
-
-
-/* Fin */
-/* /* Fin de la Tabla: dbpacientes*/
+   /* /* Fin de la Tabla: dbsocios*/
 
 
 /* PARA Aseguradoras */
@@ -484,18 +459,18 @@ return $res;
 
 /* PARA Tiposervicios */
 
-function insertarTiposervicios($tiposervicio) {
-$sql = "insert into tbtiposervicios(idtiposervicio,tiposervicio)
-values ('','".$tiposervicio."')";
+function insertarTiposervicios($tiposervicio,$precio) {
+$sql = "insert into tbtiposervicios(idtiposervicio,tiposervicio,precio)
+values ('','".$tiposervicio."',".$precio.")";
 $res = $this->query($sql,1);
 return $res;
 }
 
 
-function modificarTiposervicios($id,$tiposervicio) {
+function modificarTiposervicios($id,$tiposervicio,$precio) {
 $sql = "update tbtiposervicios
 set
-tiposervicio = '".$tiposervicio."'
+tiposervicio = '".$tiposervicio."',precio = ".$precio."
 where idtiposervicio =".$id;
 $res = $this->query($sql,0);
 return $res;
@@ -512,7 +487,8 @@ return $res;
 function traerTiposervicios() {
 $sql = "select
 t.idtiposervicio,
-t.tiposervicio
+t.tiposervicio,
+t.precio
 from tbtiposervicios t
 order by 1";
 $res = $this->query($sql,0);
@@ -531,7 +507,8 @@ function traerTiposerviciosajax($length, $start, $busqueda,$colSort,$colSortDir)
 
    $sql = "select
    t.idtiposervicio,
-   t.tiposervicio
+   t.tiposervicio,
+   t.precio
    from tbtiposervicios t
    ".$where."
    ORDER BY ".$colSort." ".$colSortDir." ";
@@ -545,7 +522,7 @@ function traerTiposerviciosajax($length, $start, $busqueda,$colSort,$colSortDir)
 
 
 function traerTiposerviciosPorId($id) {
-$sql = "select idtiposervicio,tiposervicio from tbtiposervicios where idtiposervicio =".$id;
+$sql = "select idtiposervicio,tiposervicio,precio from tbtiposervicios where idtiposervicio =".$id;
 $res = $this->query($sql,0);
 return $res;
 }

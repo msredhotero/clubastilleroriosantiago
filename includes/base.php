@@ -4,7 +4,7 @@
  * @author Saupurein Marcos
  * @copyright 2018
  */
-date_default_timezone_set('America/Mexico_City');
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 include ('funcionesNotificaciones.php');
 $serviciosNoti = new ServiciosNotificaciones();
@@ -21,7 +21,7 @@ class BaseHTML extends ServiciosNotificaciones {
                          5=>'<link href="'.$altura.'plugins/sweetalert/sweetalert.css" rel="stylesheet" />',
                          6=>'<link href="'.$altura.'plugins/bootstrap-select/css/bootstrap-select.css" rel="stylesheet" />',
                          7=>'<link href="'.$altura.'css/ventanaModal.css" rel="stylesheet" />',
-                         8=>'<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">',
+                         8=>'<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">',
                          9=>'<link href="'.$altura.'css/estilos.css" rel="stylesheet">'
                       );
 
@@ -245,7 +245,7 @@ class BaseHTML extends ServiciosNotificaciones {
                     </div>
                 </nav>
 
-               
+
     ';
         echo $cad;
     }

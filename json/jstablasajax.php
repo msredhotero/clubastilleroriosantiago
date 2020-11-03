@@ -69,8 +69,8 @@ function armarAccionesDropDown($id,$label='',$class,$icon) {
 }
 
 switch ($tabla) {
-	case 'aseguradoras':
-		$datos = $serviciosReferencias->traerAseguradorasajax($length, $start, $busqueda,$colSort,$colSortDir);
+	case 'socios':
+		$datos = $serviciosReferencias->traerSociosajax($length, $start, $busqueda,$colSort,$colSortDir);
 
 		$resAjax = $datos[0];
 		$res = $datos[1];
@@ -82,7 +82,7 @@ switch ($tabla) {
 
 		$indiceID = 0;
 		$empieza = 1;
-		$termina = 1;
+		$termina = 10;
 	break;
 	case 'empleados':
 		$datos = $serviciosReferencias->traerEmpleadosajax($length, $start, $busqueda,$colSort,$colSortDir);
@@ -127,7 +127,7 @@ switch ($tabla) {
 
 		$indiceID = 0;
 		$empieza = 1;
-		$termina = 1;
+		$termina = 2;
 	break;
 	case 'pacientes':
 		$datos = $serviciosReferencias->traerPacientesajax($length, $start, $busqueda,$colSort,$colSortDir);

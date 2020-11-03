@@ -177,7 +177,7 @@ if ($_SESSION['idroll_sahilices'] == 7) {
 						</div>
 						<div class="body table-responsive">
 							<form class="form" id="formFacturas">
-								<h2>Bienvenidos al Sistema de Gestión de Clinicas</h2>
+								<h2>Bienvenidos al Sistema de Gestión de Clubes</h2>
 							</form>
 						</div>
 					</div>

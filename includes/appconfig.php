@@ -1,6 +1,6 @@
 <?php
 
-date_default_timezone_set('America/Mexico_City');
+date_default_timezone_set('America/Argentina/Buenos_Aires');
 
 class appconfig {
 
@@ -13,7 +13,7 @@ function conexion() {
 */
 
 	$hostname = "localhost";
-	$database = "gestionclinicas";
+	$database = "clubastillo";
 	$username = "root";
 	$password = "";
 
